@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maguta Watch — AI Competitive Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#C8A050;--gold-light:#E8C878;--gold-dim:#8B6F35;--green:#4A9A6A}
+  [data-theme="light"]{--bg:#F8F5EF;--bg2:#EEE9DF;--bg3:#E5DFD2;--text:#1A1A10;--muted:#6A6A5A;--border:rgba(139,111,53,0.25);--nav:rgba(248,245,239,0.96)}
+  [data-theme="dark"]{--bg:#080A08;--bg2:#0F120F;--bg3:#161A16;--text:#F8F5EF;--muted:#8A8A7A;--border:rgba(200,160,80,0.2);--nav:rgba(8,10,8,0.96)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden;transition:background .4s,color .4s}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--nav);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);transition:background .4s}
+  .nav-logo{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;color:var(--gold);letter-spacing:.15em;text-decoration:none}
+  .nav-logo span{color:var(--text);font-weight:400}
+  .nav-links{display:flex;gap:28px;list-style:none}
+  .nav-links a{color:var(--muted);text-decoration:none;font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.05em;transition:color .3s}
+  .nav-links a:hover{color:var(--gold)}
+  .nav-right{display:flex;gap:10px;align-items:center}
+  .tg{display:flex;gap:3px;background:rgba(200,160,80,.1);border:1px solid var(--border);border-radius:20px;padding:3px}
+  .tb{padding:4px 12px;border-radius:16px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:.72rem;transition:all .3s}
+  .tb.active{background:var(--gold);color:#080A08;font-weight:500}
+  .theme-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:rgba(200,160,80,.1);color:var(--gold);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .3s}
+  .theme-btn:hover{background:rgba(200,160,80,.2)}
+
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:120px 40px 80px;position:relative;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(200,160,80,.07) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(74,154,106,.04) 0%,transparent 60%)}.hero::after{display:none}
+  
+  .scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanA 5s ease-in-out infinite;opacity:.7;z-index:2}
+  @keyframes scanA{0%{top:0%;opacity:0}10%{opacity:.8}90%{opacity:.8}100%{top:100%;opacity:0}}
+
+  .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,160,80,.1);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--gold);letter-spacing:.1em;margin-bottom:32px;animation:fu .7s ease both}
+  .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+  h1{font-family:'Cinzel',serif;font-size:clamp(2.4rem,5.5vw,4.8rem);font-weight:900;line-height:1.05;letter-spacing:.02em;margin-bottom:8px;animation:fu .7s ease .1s both}
+  h1 .gold{color:var(--gold)}
+  .hero-sub{font-family:'Cinzel',serif;font-size:clamp(.9rem,2vw,1.5rem);font-weight:400;color:var(--muted);letter-spacing:.3em;margin-bottom:28px;animation:fu .7s ease .2s both}
+  .hero-desc{font-size:clamp(1rem,1.8vw,1.2rem);color:var(--muted);max-width:580px;line-height:1.75;margin-bottom:44px;font-weight:300;animation:fu .7s ease .3s both}
+  .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fu .7s ease .4s both}
+  .stats{display:flex;gap:56px;justify-content:center;margin-top:72px;padding:36px;border-top:1px solid var(--border);animation:fu .7s ease .5s both;flex-wrap:wrap}
+  .stat{text-align:center}
+  .sn{font-family:'Cinzel',serif;font-size:2.3rem;font-weight:700;color:var(--gold);display:block}
+  .sl{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+
+  .btn-p{background:var(--gold);color:#080A08;border:none;padding:14px 32px;font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;border-radius:2px;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block}
+  .btn-p:hover{background:var(--gold-light);transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,160,80,.3)}
+  .btn-s{background:transparent;color:var(--gold);border:1px solid var(--border);padding:14px 32px;font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;border-radius:2px;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block}
+  .btn-s:hover{border-color:var(--gold);background:rgba(200,160,80,.05)}
+
+  .sec{padding:90px 40px;max-width:1200px;margin:0 auto}
+  .sl2{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--gold);letter-spacing:.3em;text-transform:uppercase;margin-bottom:14px}
+  .st{font-family:'Cinzel',serif;font-size:clamp(1.7rem,3.5vw,2.8rem);font-weight:700;margin-bottom:14px;line-height:1.2}
+  .sd{color:var(--muted);font-size:1.08rem;max-width:580px;line-height:1.7;margin-bottom:56px}
+  hr.dv{border:none;border-top:1px solid var(--border);margin:0 40px}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2px;background:var(--border)}
+  .step{background:var(--bg2);padding:44px 36px;transition:background .3s}
+  .step:hover{background:var(--bg3)}
+  .snum{font-family:'Cinzel',serif;font-size:2.8rem;font-weight:900;color:rgba(200,160,80,.15);line-height:1;margin-bottom:20px}
+  .sico{font-size:1.7rem;margin-bottom:14px}
+  .step h3{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;color:var(--gold);margin-bottom:10px;letter-spacing:.05em}
+  .step p{color:var(--muted);font-size:.93rem;line-height:1.7}
+
+  .report{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:36px;font-family:'DM Mono',monospace;font-size:.78rem;line-height:1.9;margin-top:56px;position:relative}
+  .report::before{content:'LIVE REPORT EXAMPLE';position:absolute;top:14px;right:18px;font-size:.62rem;color:var(--gold-dim);letter-spacing:.2em}
+  .rh{color:var(--gold);font-size:.85rem;font-weight:500;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .rs{margin-bottom:18px}
+  .rst{color:var(--gold);margin-bottom:6px;font-size:.72rem;letter-spacing:.1em}
+  .ri{color:var(--muted);margin-bottom:3px}
+  .ra{color:var(--green)}
+  .rw{color:#E8A050}
+
+  .notif{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px;max-width:340px;margin:36px auto 0}
+  .nh{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+  .ni{width:30px;height:30px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+  .nb{font-size:.88rem;line-height:1.6;color:var(--muted)}
+  .nb strong{color:var(--gold)}
+
+  .pg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);margin-top:56px}
+  .pc{background:var(--bg2);padding:44px 36px;transition:all .3s}
+  .pc.feat{background:var(--bg3);border:1px solid rgba(200,160,80,.4);margin:-1px;z-index:1}
+  .pc:hover{background:var(--bg3)}
+  .pbadge{display:inline-block;background:var(--gold);color:#080A08;font-family:'DM Mono',monospace;font-size:.62rem;font-weight:500;letter-spacing:.15em;padding:4px 12px;margin-bottom:20px}
+  .plv{font-family:'Cinzel',serif;font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:6px}
+  .ppr{font-family:'Cinzel',serif;font-size:2.8rem;font-weight:900;color:var(--gold);line-height:1;margin-bottom:4px}
+  .ppr span{font-size:.95rem;font-weight:400;color:var(--muted);font-family:'DM Mono',monospace}
+  .pds{color:var(--muted);font-size:.88rem;margin-bottom:28px;font-style:italic}
+  .pft{list-style:none;margin-bottom:36px}
+  .pft li{padding:9px 0;border-bottom:1px solid rgba(200,160,80,.08);font-size:.93rem;color:var(--text);display:flex;align-items:flex-start;gap:9px;opacity:.85}
+  .pft li::before{content:'→';color:var(--gold);font-size:.78rem;margin-top:2px;flex-shrink:0}
+
+  .fw{background:var(--bg2);border:1px solid var(--border);padding:56px;position:relative}
+  .fw::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .fg2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:36px}
+  .fg{display:flex;flex-direction:column;gap:7px}
+  .fg.full{grid-column:1/-1}
+  label{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase}
+  input,select,textarea{background:rgba(200,160,80,.05);border:1px solid var(--border);color:var(--text);padding:13px 15px;font-family:'Crimson Pro',serif;font-size:1rem;border-radius:2px;outline:none;transition:border-color .3s;width:100%}
+  input:focus,select:focus{border-color:var(--gold)}
+  select option{background:var(--bg2);color:var(--text)}
+  .mt{display:flex;gap:2px;background:var(--border);padding:2px;border-radius:2px;margin-bottom:14px}
+  .mb{flex:1;padding:9px 14px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.04em;transition:all .3s;border-radius:1px}
+  .mb.active{background:var(--bg);color:var(--gold)}
+  #mi{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);padding:11px;border:1px solid var(--border);border-radius:2px}
+  .rg{display:flex;flex-direction:column;gap:10px}
+  .ro{display:flex;align-items:center;gap:11px;cursor:pointer;padding:11px 14px;border:1px solid var(--border);border-radius:2px;transition:all .3s}
+  .ro:hover{border-color:var(--gold);background:rgba(200,160,80,.04)}
+  .ro input[type="radio"]{width:auto;accent-color:var(--gold)}
+  .rl{font-size:.93rem;color:var(--text)}
+  .rl small{display:block;color:var(--muted);font-size:.77rem;margin-top:1px;font-family:'DM Mono',monospace}
+  .tr{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+  .tag{background:rgba(200,160,80,.08);border:1px solid var(--border);color:var(--gold);padding:4px 11px;font-family:'DM Mono',monospace;font-size:.68rem;border-radius:2px;display:flex;align-items:center;gap:6px}
+  .tag .x{cursor:pointer;opacity:.5;transition:opacity .2s}
+  .tag .x:hover{opacity:1}
+  .ar{display:flex;gap:8px}
+  .ar input{flex:1}
+  .ab{background:rgba(200,160,80,.1);border:1px solid var(--border);color:var(--gold);padding:13px 18px;cursor:pointer;font-family:'DM Mono',monospace;font-size:.77rem;border-radius:2px;transition:all .3s;white-space:nowrap}
+  .ab:hover{background:rgba(200,160,80,.2);border-color:var(--gold)}
+  .ff{margin-top:28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .fn{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted)}
+
+  .help{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);line-height:1.5}
+  .mini{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--gold-dim);line-height:1.5;margin-top:2px}
+  .place-card{border:1px solid var(--border);background:rgba(200,160,80,.04);padding:12px 14px;border-radius:2px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);line-height:1.55;display:none}
+  .place-card strong{color:var(--gold);font-weight:500}
+  .comp-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+  .comp-limit{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted)}
+  .comp-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .comp-card{border:1px solid var(--border);background:rgba(200,160,80,.04);padding:12px;border-radius:2px;cursor:pointer;transition:all .25s;display:flex;gap:10px;align-items:flex-start}
+  .comp-card:hover{border-color:var(--gold);background:rgba(200,160,80,.08)}
+  .comp-card input{width:auto;margin-top:3px;accent-color:var(--gold);flex-shrink:0}
+  .comp-name{font-family:'Cinzel',serif;font-size:.9rem;color:var(--text);font-weight:600;line-height:1.35}
+  .comp-meta{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);line-height:1.45;margin-top:4px}
+  .status{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:10px;line-height:1.5}
+  .status.ok{color:var(--green)}
+  .status.warn{color:#E8A050}
+  .selected-box{border:1px solid var(--border);padding:12px;border-radius:2px;background:rgba(200,160,80,.03);margin-top:12px}
+  @media(max-width:700px){.comp-list{grid-template-columns:1fr}.comp-head{align-items:flex-start}}
+
+  footer{padding:56px 40px 36px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:28px}
+  .flo{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:700;color:var(--gold);margin-bottom:6px}
+  .fta{font-family:'DM Mono',monospace;font-size:.67rem;color:var(--muted);letter-spacing:.2em}
+  .fli{display:flex;gap:22px;flex-wrap:wrap}
+  .fli a{font-family:'DM Mono',monospace;font-size:.67rem;color:var(--muted);text-decoration:none;letter-spacing:.08em;transition:color .3s}
+  .fli a:hover{color:var(--gold)}
+
+  @keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+  .rev{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+  .rev.vis{opacity:1;transform:translateY(0)}
+  .pac-container{z-index:99999!important;font-family:'DM Mono',monospace}
+
+  @media(max-width:900px){.pg{grid-template-columns:1fr}.nav-links{display:none}nav{padding:14px 20px}}
+  @media(max-width:700px){.fg2{grid-template-columns:1fr}.fw{padding:36px 22px}.hero{padding:100px 22px 60px}.stats{gap:28px;padding:28px 20px}.sec{padding:60px 22px}}
+
+  .billing-toggle{display:flex;justify-content:center;gap:8px;margin:26px 0 32px;flex-wrap:wrap}
+  .billing-toggle button{background:transparent;color:var(--muted);border:1px solid var(--border);padding:12px 22px;font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;letter-spacing:.08em;border-radius:2px;cursor:pointer;transition:all .3s}
+  .billing-toggle button.active{background:var(--gold);color:#080A08;border-color:var(--gold)}
+  .saving{color:var(--gold);font-size:.82rem;text-align:center;margin-top:-16px;margin-bottom:28px;letter-spacing:.04em}
+  .pay-options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:20px}
+  .pay-options a{display:block;text-align:center;padding:13px 14px;font-size:.78rem}
+  .annual-note{color:var(--gold);font-size:.82rem;margin-top:8px;min-height:18px}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="/config.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">MAGUTA <span>WATCH</span></a>
+  <ul class="nav-links">
+    <li><a href="#how" data-en="How it works" data-fr="Comment ça marche">How it works</a></li>
+    <li><a href="#pricing" data-en="Pricing" data-fr="Tarifs">Pricing</a></li>
+    <li><a href="#signup" data-en="Get started" data-fr="Démarrer">Get started</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="tg">
+      <button class="tb active" onclick="setLang('en')">EN</button>
+      <button class="tb" onclick="setLang('fr')">FR</button>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()" id="ti">🌙</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="scan"></div>
+  <div class="badge"><span class="dot"></span><span data-en="Real-time AI surveillance" data-fr="Surveillance IA en temps réel">Real-time AI surveillance</span></div>
+  <h1><span data-en="Your AI that watches" data-fr="Votre IA qui surveille">Your AI that watches</span><br><span class="gold" data-en="your competitors" data-fr="vos concurrents">your competitors</span></h1>
+  <p class="hero-sub">Intelligence · Market · Precision</p>
+  <p class="hero-desc" data-en="Maguta Watch automatically scans your competitors 24/7 — prices, offers, social media, innovations — and sends you a complete report every morning. Zero effort. Strategic decisions." data-fr="Maguta Watch scanne automatiquement vos concurrents 24h/24 — prix, offres, réseaux sociaux, innovations — et vous envoie chaque matin un rapport complet. Zéro effort. Décisions stratégiques.">Maguta Watch automatically scans your competitors 24/7 — prices, offers, social media, innovations — and sends you a complete report every morning. Zero effort. Strategic decisions.</p>
+  <div class="cta">
+    <a href="#signup" class="btn-p" data-en="Start now" data-fr="Commencer maintenant">Start now</a>
+    <a href="#how" class="btn-s" data-en="See how it works" data-fr="Voir comment ça marche">See how it works</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="sn">24/7</span><span class="sl" data-en="Continuous monitoring" data-fr="Surveillance continue">Continuous monitoring</span></div>
+    <div class="stat"><span class="sn">∞</span><span class="sl" data-en="Sectors covered" data-fr="Secteurs couverts">Sectors covered</span></div>
+    <div class="stat"><span class="sn">0</span><span class="sl" data-en="Manual action required" data-fr="Action manuelle requise">Manual action required</span></div>
+    <div class="stat"><span class="sn">⚡</span><span class="sl" data-en="Clear recommendations" data-fr="Recommandations claires">Clear recommendations</span></div>
+  </div>
+</section>
+
+<hr class="dv">
+
+<section id="how" class="sec rev">
+  <p class="sl2" data-en="HOW IT WORKS" data-fr="FONCTIONNEMENT">HOW IT WORKS</p>
+  <h2 class="st" data-en="Simple as it gets" data-fr="Simple comme bonjour">Simple as it gets</h2>
+  <p class="sd" data-en="You give your sector and location. AI does everything else." data-fr="Vous donnez votre secteur et votre zone. L'IA fait tout le reste.">You give your sector and location. AI does everything else.</p>
+  <div class="steps">
+    <div class="step"><div class="snum">01</div><div class="sico">📋</div><h3 data-en="Sign up" data-fr="Inscrivez-vous">Sign up</h3><p data-en="Choose your plan, enter your business sector and location. AI automatically finds your competitors." data-fr="Choisissez votre plan, renseignez votre secteur et zone. L'IA trouve automatiquement vos concurrents.">Choose your plan, enter your business sector and location. AI automatically finds your competitors.</p></div>
+    <div class="step"><div class="snum">02</div><div class="sico">🔍</div><h3 data-en="AI monitors" data-fr="L'IA surveille">AI monitors</h3><p data-en="Our system analyzes competitor websites, visible offers, reviews and digital signals based on your plan." data-fr="Notre système analyse les sites concurrents, les offres visibles, les avis et les signaux digitaux selon votre offre.">Our system analyzes competitor websites, visible offers, reviews and digital signals based on your plan.</p></div>
+    <div class="step"><div class="snum">03</div><div class="sico">📊</div><h3 data-en="Weekly report" data-fr="Rapport hebdomadaire">Weekly report</h3><p data-en="Receive a structured report by email with competitor insights, visible offers and AI recommendations." data-fr="Recevez un rapport structuré par email avec les informations concurrentielles, offres visibles et recommandations IA.">Receive a structured report by email with competitor insights, visible offers and AI recommendations.</p></div>
+    <div class="step"><div class="snum">04</div><div class="sico">⚡</div><h3 data-en="Clear recommendations" data-fr="Recommandations claires">Clear recommendations</h3><p data-en="The report highlights what changed, what matters and which actions to prioritize." data-fr="Le rapport met en évidence ce qui change, ce qui compte et les actions à prioriser.">The report highlights what changed, what matters and which actions to prioritize.</p></div>
+  </div>
+
+  <div class="report">
+    <div class="rh">🔍 MAGUTA WATCH — <span data-en="Report April 27, 2026 — Car rental, Geneva" data-fr="Rapport 27 avril 2026 — Location voitures, Genève">Report April 27, 2026 — Car rental, Geneva</span></div>
+    <div class="rs"><div class="rst">📊 <span data-en="MONITORED COMPETITORS" data-fr="CONCURRENTS SURVEILLÉS">MONITORED COMPETITORS</span></div><div class="ri">→ Europcar GE: <span class="rw" data-en="-20% SUV this weekend (NEW)" data-fr="-20% SUV ce weekend (NOUVEAU)">-20% SUV this weekend (NEW)</span></div><div class="ri">→ Hertz Geneva: <span data-en="New home delivery service launched" data-fr="Nouveau service livraison à domicile lancé">New home delivery service launched</span></div><div class="ri">→ Sixt CH: <span data-en="Stable prices — active Instagram campaign" data-fr="Prix stables — campagne Instagram active">Stable prices — active Instagram campaign</span></div></div>
+    <div class="rs"><div class="rst">🌍 <span data-en="GLOBAL LEADERS" data-fr="LEADERS INTERNATIONAUX">GLOBAL LEADERS</span></div><div class="ri">→ Enterprise (USA): <span class="ra" data-en="AI predictive booking app launched" data-fr="App IA réservation prédictive lancée">AI predictive booking app launched</span></div><div class="ri">→ Sixt Global: <span data-en="100% electric fleet announced 2026" data-fr="Flotte 100% électrique annoncée 2026">100% electric fleet announced 2026</span></div></div>
+    <div class="rs"><div class="rst">💡 <span data-en="AI RECOMMENDATIONS" data-fr="RECOMMANDATIONS IA">AI RECOMMENDATIONS</span></div><div class="ri ra" data-en="→ URGENT: Europcar drops prices this weekend — counter-offer recommended" data-fr="→ URGENT: Europcar baisse ses prix ce weekend — contre-offre recommandée">→ URGENT: Europcar drops prices this weekend — counter-offer recommended</div><div class="ri" data-en="→ OPPORTUNITY: Home delivery is trending — offer this service first in your city" data-fr="→ OPPORTUNITÉ: La livraison à domicile séduit — proposez ce service en premier dans votre ville">→ OPPORTUNITY: Home delivery is trending — offer this service first in your city</div></div>
+  </div>
+
+  <div class="notif">
+    <div class="nh"><div class="ni">👁️</div><div><div style="color:var(--gold);font-weight:500">Maguta Watch</div><div data-en="2 minutes ago" data-fr="Il y a 2 minutes">2 minutes ago</div></div></div>
+    <div class="nb" data-en="⚡ <strong>ALERT</strong> — Europcar just dropped SUV prices by 20%. React now." data-fr="⚡ <strong>ALERTE</strong> — Europcar vient de baisser ses prix SUV de 20%. Réagissez maintenant.">⚡ <strong>ALERT</strong> — Europcar just dropped SUV prices by 20%. React now.</div>
+  </div>
+</section>
+
+<hr class="dv">
+
+<section id="pricing" class="sec rev">
+  <p class="sl2" data-en="PRICING" data-fr="TARIFS">PRICING</p>
+  <h2 class="st" data-en="Choose your level" data-fr="Choisissez votre niveau">Choose your level</h2>
+  <p class="sd" data-en="Monthly or yearly billing. Yearly plans include a discount." data-fr="Paiement mensuel ou annuel. Les offres annuelles incluent une réduction.">Monthly or yearly billing. Yearly plans include a discount.</p>
+
+  <div class="billing-toggle">
+    <button type="button" class="active" onclick="setBilling('monthly', this)" data-en="Monthly" data-fr="Mensuel">Monthly</button>
+    <button type="button" onclick="setBilling('yearly', this)" data-en="Yearly" data-fr="Annuel">Yearly</button>
+  </div>
+  <div class="saving" data-en="Yearly billing saves 2 months." data-fr="Le paiement annuel vous fait économiser 2 mois.">Yearly billing saves 2 months.</div>
+
+  <div class="pg">
+    <div class="pc">
+      <div class="plv">Starter</div>
+      <div class="ppr"><span data-price="starter">9€</span> <span data-period="starter" data-en="/month" data-fr="/mois">/month</span></div>
+      <div class="annual-note" data-note="starter"></div>
+      <p class="pds" data-en="Ideal for freelancers and small businesses" data-fr="Idéal pour indépendants et petites entreprises">Ideal for freelancers and small businesses</p>
+      <ul class="pft">
+        <li data-en="3 local competitors" data-fr="3 concurrents locaux">3 local competitors</li>
+        <li data-en="Automatic or manual competitor selection" data-fr="Sélection automatique ou manuelle des concurrents">Automatic or manual competitor selection</li>
+        <li data-en="1 weekly report by email" data-fr="1 rapport hebdomadaire par email">1 weekly report by email</li>
+        <li data-en="Prices, visible offers and website signals" data-fr="Prix, offres visibles et signaux web">Prices, visible offers and website signals</li>
+      </ul>
+      <div class="pay-options"><a href="https://buy.stripe.com/aFadR12RlcbRgwx7AS0Fi00" class="btn-s" data-checkout="starter" data-en="Get started" data-fr="Commencer">Get started</a></div>
+    </div>
+    <div class="pc feat">
+      <div class="pbadge" data-en="MOST POPULAR" data-fr="LE PLUS POPULAIRE">MOST POPULAR</div>
+      <div class="plv">Pro</div>
+      <div class="ppr"><span data-price="pro">19€</span> <span data-period="pro" data-en="/month" data-fr="/mois">/month</span></div>
+      <div class="annual-note" data-note="pro"></div>
+      <p class="pds" data-en="For growing SMEs that want to stay ahead" data-fr="Pour les PME en croissance qui veulent garder l'avantage">For growing SMEs that want to stay ahead</p>
+      <ul class="pft">
+        <li data-en="5 regional competitors" data-fr="5 concurrents régionaux">5 regional competitors</li>
+        <li data-en="Automatic or manual competitor selection" data-fr="Sélection automatique ou manuelle des concurrents">Automatic or manual competitor selection</li>
+        <li data-en="1–2 weekly reports by email" data-fr="1–2 rapports hebdomadaires par email">1–2 weekly reports by email</li>
+        <li data-en="Prices, social signals, reviews and positioning" data-fr="Prix, signaux sociaux, avis et positionnement">Prices, social signals, reviews and positioning</li>
+      </ul>
+      <div class="pay-options"><a href="https://buy.stripe.com/bJe8wH63xgs73JL6wO0Fi02" class="btn-p" data-checkout="pro" data-en="Get started" data-fr="Commencer">Get started</a></div>
+    </div>
+    <div class="pc">
+      <div class="plv">Enterprise</div>
+      <div class="ppr"><span data-price="enterprise">29€</span> <span data-period="enterprise" data-en="/month" data-fr="/mois">/month</span></div>
+      <div class="annual-note" data-note="enterprise"></div>
+      <p class="pds" data-en="For companies that want wider market coverage" data-fr="Pour les entreprises qui veulent une couverture plus large">For companies that want wider market coverage</p>
+      <ul class="pft">
+        <li data-en="10 competitors monitored" data-fr="10 concurrents surveillés">10 competitors monitored</li>
+        <li data-en="Multi-zone monitoring" data-fr="Surveillance multi-zone">Multi-zone monitoring</li>
+        <li data-en="Weekly strategic report by email" data-fr="Rapport stratégique hebdomadaire par email">Weekly strategic report by email</li>
+        <li data-en="Strategic AI recommendations" data-fr="Recommandations stratégiques IA">Strategic AI recommendations</li>
+      </ul>
+      <div class="pay-options"><a href="https://buy.stripe.com/8x29ALbnR3Fla899J00Fi01" class="btn-s" data-checkout="enterprise" data-en="Get started" data-fr="Commencer">Get started</a></div>
+    </div>
+  </div>
+</section>
+
+<hr class="dv">
+
+<section id="signup" class="sec rev">
+  <p class="sl2" data-en="SIGN UP" data-fr="INSCRIPTION">SIGN UP</p>
+  <h2 class="st" data-en="Start in 2 minutes" data-fr="Démarrez en 2 minutes">Start in 2 minutes</h2>
+  <p class="sd" data-en="Your report request is prepared after signup." data-fr="Votre demande de rapport est préparée après inscription.">Your report request is prepared after signup.</p>
+  <div class="fw">
+    <form id="sf" onsubmit="return handleSubmit(event)">
+      <input type="hidden" name="language" id="languageField" value="en">
+      <input type="hidden" name="company_place_id" id="companyPlaceId">
+      <input type="hidden" name="company_address" id="companyAddress">
+      <input type="hidden" name="company_lat" id="companyLat">
+      <input type="hidden" name="company_lng" id="companyLng">
+      <input type="hidden" name="competitors" id="ch">
+      <input type="hidden" name="competitors_json" id="competitorsJson">
+      <input type="hidden" name="email_summary" id="emailSummary">
+      <input type="hidden" name="openai_prompt" id="openaiPrompt">
+      <input type="hidden" name="admin_premium_brief" id="adminPremiumBrief">
+      <input type="hidden" name="client_confirmation_preview" id="clientConfirmationPreview">
+      <div class="fg2">
+        <div class="fg">
+          <label data-en="COMPANY NAME" data-fr="NOM DE L'ENTREPRISE">COMPANY NAME</label>
+          <input type="text" name="company" id="companyInput" placeholder="e.g. My Car Rental Co." data-en="e.g. My Car Rental Co." data-fr="ex. Restaurant du Lac" required autocomplete="off">
+          <div class="place-card" id="companyCard"></div>
+          <div class="help" data-en="Select your exact business from Google results." data-fr="Sélectionnez votre entreprise exacte dans les résultats Google.">Select your exact business from Google results.</div>
+        </div>
+        <div class="fg"><label data-en="BUSINESS SECTOR" data-fr="SECTEUR D'ACTIVITÉ">BUSINESS SECTOR</label>
+          <select name="sector" id="sectorSelect" required></select>
+          <div class="help" data-en="The list adapts to the selected language." data-fr="La liste s'adapte à la langue sélectionnée.">The list adapts to the selected language.</div>
+        </div>
+        <div class="fg"><label>EMAIL</label><input type="email" name="email" id="emailInput" placeholder="contact@mycompany.com" required></div>
+        <div class="fg"><label data-en="TELEGRAM (OPTIONAL)" data-fr="TELEGRAM (OPTIONNEL)">TELEGRAM (OPTIONAL)</label><input type="text" name="telegram" id="telegramInput" placeholder="@myusername"></div>
+        <div class="fg"><label data-en="YOUR CITY / REGION / COUNTRY" data-fr="VOTRE VILLE / RÉGION / PAYS">YOUR CITY / REGION / COUNTRY</label><input type="text" name="location" id="locationInput" placeholder="e.g. Geneva, Vaud, Switzerland" data-en="e.g. Geneva, Vaud, Switzerland" data-fr="ex. Genève, Vaud, Suisse" required></div>
+        <div class="fg"><label data-en="CHOSEN PLAN" data-fr="PLAN CHOISI">CHOSEN PLAN</label>
+          <select name="plan" id="planSelect" required onchange="updatePlanLimit()">
+            <option value="" data-en="Select your plan" data-fr="Sélectionnez votre plan">Select your plan</option>
+            <option value="starter">Starter — 9€/month or 90€/year</option>
+            <option value="pro">Pro — 19€/month or 190€/year</option>
+            <option value="enterprise">Enterprise — 29€/month or 290€/year</option>
+          </select>
+        </div>
+        <div class="fg full">
+          <label data-en="MONITORING MODE" data-fr="MODE DE SURVEILLANCE">MONITORING MODE</label>
+          <div class="mt">
+            <button type="button" class="mb active" onclick="setMode('auto',this)" data-en="🤖 Automatic" data-fr="🤖 Automatique">🤖 Automatic</button>
+            <button type="button" class="mb" onclick="setMode('manual',this)" data-en="✏️ Manual" data-fr="✏️ Manuel">✏️ Manual</button>
+            <button type="button" class="mb" onclick="setMode('mixed',this)" data-en="⚡ Mixed" data-fr="⚡ Mixte">⚡ Mixed</button>
+          </div>
+          <div id="mi" data-en="AI automatically detects your top competitors based on your sector and geographic area." data-fr="L'IA détecte automatiquement vos meilleurs concurrents selon votre secteur et zone géographique.">AI automatically detects your top competitors based on your sector and geographic area.</div>
+        </div>
+        <div class="fg full" id="ms" style="display:none">
+          <div class="comp-head">
+            <label data-en="SELECT COMPETITORS" data-fr="SÉLECTIONNER LES CONCURRENTS">SELECT COMPETITORS</label>
+            <div class="comp-limit" id="compLimit">Starter: max 3 · Pro: max 5 · Enterprise: max 10</div>
+          </div>
+          <div class="ar"><input type="text" id="ci" placeholder="e.g. europcar.ch or Hertz Geneva" data-en="e.g. europcar.ch or Hertz Geneva" data-fr="ex. Restaurant Central Genève" autocomplete="off"><button type="button" class="ab" onclick="addC()" data-en="+ Add" data-fr="+ Ajouter">+ Add</button></div>
+          <button type="button" class="ab" onclick="searchCompetitors()" style="margin-top:10px;width:max-content" data-en="Find competitors with Google Places" data-fr="Trouver des concurrents avec Google Places">Find competitors with Google Places</button>
+          <div class="status" id="compStatus" data-en="Select your company, sector and plan, then search competitors." data-fr="Sélectionnez votre entreprise, secteur et plan, puis cherchez les concurrents.">Select your company, sector and plan, then search competitors.</div>
+          <div class="comp-list" id="compResults"></div>
+          <div class="selected-box"><div class="mini" data-en="Selected competitors" data-fr="Concurrents sélectionnés">Selected competitors</div><div class="tr" id="ct"></div></div>
+        </div>
+        <div class="fg full">
+          <label data-en="RECEIVE REPORTS VIA" data-fr="RECEVOIR LES RAPPORTS PAR">RECEIVE REPORTS VIA</label>
+          <div class="rg">
+            <label class="ro"><input type="radio" name="delivery" value="email" checked><div class="rl">Email<small data-en="Premium report delivered directly to your inbox" data-fr="Rapport premium envoyé directement dans votre boîte mail">Premium report delivered directly to your inbox</small></div></label>
+          </div>
+        </div>
+      </div>
+      <div class="ff">
+        <button type="submit" class="btn-p" data-en="Start my monitoring →" data-fr="Démarrer ma surveillance →">Start my monitoring →</button>
+        <p class="fn" data-en="First month free · No commitment · Cancel anytime" data-fr="Premier mois gratuit · Sans engagement · Résiliation à tout moment">First month free · No commitment · Cancel anytime</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<hr class="dv">
+<footer>
+  <div><div class="flo">MAGUTA WATCH</div><div class="fta">Intelligence · Market · Precision</div></div>
+  <div class="fli">
+    <a href="#" data-en="Terms of service" data-fr="Conditions d'utilisation">Terms of service</a>
+    <a href="#" data-en="Privacy policy" data-fr="Politique de confidentialité">Privacy policy</a>
+    <a href="mailto:contactmaguta@gmail.com">contactmaguta@gmail.com</a>
+  </div>
+</footer>
+
+<script>
+  let lang='en',theme='light',mode='auto',comps=[],selectedCompany=null,placesService=null,suggestedCompetitors=[];
+
+  const CHECKOUT_LINKS = {
+    monthly: {
+      starter: 'https://buy.stripe.com/aFadR12RlcbRgwx7AS0Fi00',
+      pro: 'https://buy.stripe.com/bJe8wH63xgs73JL6wO0Fi02',
+      enterprise: 'https://buy.stripe.com/8x29ALbnR3Fla899J00Fi01'
+    },
+    yearly: {
+      starter: 'https://buy.stripe.com/9B6dR1dvZ7VB2FH9J00Fi05',
+      pro: 'https://buy.stripe.com/3cI28j9fJ5Nt6VXaN40Fi03',
+      enterprise: 'https://buy.stripe.com/3cIeV577B2Bha891cu0Fi04'
+    }
+  };
+  const BILLING_PRICES = {
+    monthly: {
+      starter: ['9€','/month','/mois',''],
+      pro: ['19€','/month','/mois',''],
+      enterprise: ['29€','/month','/mois','']
+    },
+    yearly: {
+      starter: ['90€','/year','/an','Save 18€ / Économie 18€'],
+      pro: ['190€','/year','/an','Save 38€ / Économie 38€'],
+      enterprise: ['290€','/year','/an','Save 58€ / Économie 58€']
+    }
+  };
+  function setBilling(period, btn){
+    document.querySelectorAll('.billing-toggle button').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    ['starter','pro','enterprise'].forEach(plan=>{
+      const [price,enPeriod,frPeriod,note]=BILLING_PRICES[period][plan];
+      const priceEl=document.querySelector('[data-price="'+plan+'"]');
+      const periodEl=document.querySelector('[data-period="'+plan+'"]');
+      const noteEl=document.querySelector('[data-note="'+plan+'"]');
+      const linkEl=document.querySelector('[data-checkout="'+plan+'"]');
+      if(priceEl) priceEl.textContent=price;
+      if(periodEl){ periodEl.textContent=(lang==='fr'?frPeriod:enPeriod); periodEl.setAttribute('data-en',enPeriod); periodEl.setAttribute('data-fr',frPeriod); }
+      if(noteEl) noteEl.textContent=note;
+      if(linkEl) linkEl.href=CHECKOUT_LINKS[period][plan];
+    });
+  }
+
+  const PLAN_LIMITS={starter:3,pro:5,enterprise:10};
+  const mi={auto:{en:"AI automatically detects your top competitors based on your sector and geographic area.",fr:"L'IA détecte automatiquement vos meilleurs concurrents selon votre secteur et zone géographique."},manual:{en:"Choose your own competitors from Google Places results or add them manually.",fr:"Choisissez vous-même vos concurrents depuis Google Places ou ajoutez-les manuellement."},mixed:{en:"AI finds your main competitors AND you can add others manually.",fr:"L'IA trouve vos concurrents principaux ET vous pouvez en ajouter d'autres manuellement."}};
+  const sectors=[
+    {v:'restaurant',en:'Restaurant',fr:'Restaurant'}, {v:'coffee_shop',en:'Coffee shop / Tea room',fr:'Café / Tea-room'}, {v:'hotel',en:'Hotel',fr:'Hôtel'}, {v:'bar',en:'Bar / Pub',fr:'Bar / Pub'}, {v:'hair_salon',en:'Hair salon',fr:'Salon de coiffure'}, {v:'beauty_salon',en:'Beauty salon',fr:'Institut de beauté'}, {v:'spa',en:'Spa / Wellness center',fr:'Spa / centre bien-être'}, {v:'gym',en:'Gym / Fitness studio',fr:'Salle de sport / fitness'}, {v:'car_garage',en:'Car garage',fr:'Garage automobile'}, {v:'car_dealer',en:'Car dealer',fr:'Concessionnaire automobile'}, {v:'car_rental',en:'Car rental',fr:'Location de voitures'}, {v:'real_estate',en:'Real estate agency',fr:'Agence immobilière'}, {v:'accounting',en:'Accounting / Fiduciary firm',fr:'Fiduciaire / comptabilité'}, {v:'insurance',en:'Insurance agency',fr:'Agence d’assurance'}, {v:'law_firm',en:'Law firm',fr:'Étude d’avocats'}, {v:'medical_clinic',en:'Medical clinic',fr:'Cabinet médical'}, {v:'dentist',en:'Dentist',fr:'Dentiste'}, {v:'physio',en:'Physiotherapy practice',fr:'Physiothérapie'}, {v:'pharmacy',en:'Pharmacy',fr:'Pharmacie'}, {v:'retail',en:'Retail store',fr:'Commerce de détail'}, {v:'clothing_store',en:'Clothing store',fr:'Magasin de vêtements'}, {v:'furniture_store',en:'Furniture store',fr:'Magasin de meubles'}, {v:'kitchen_designer',en:'Kitchen designer / Kitchen showroom',fr:'Cuisiniste / showroom cuisine'}, {v:'architect',en:'Architect',fr:'Architecte'}, {v:'construction',en:'Construction company',fr:'Entreprise de construction'}, {v:'electrician',en:'Electrician',fr:'Électricien'}, {v:'plumber',en:'Plumber',fr:'Sanitaire / plombier'}, {v:'cleaning',en:'Cleaning company',fr:'Entreprise de nettoyage'}, {v:'marketing_agency',en:'Marketing agency',fr:'Agence marketing'}, {v:'it_services',en:'IT services',fr:'Services informatiques'}, {v:'school',en:'School / Training center',fr:'École / centre de formation'}, {v:'childcare',en:'Childcare / Nursery',fr:'Crèche / garderie'}, {v:'pet_services',en:'Pet services',fr:'Services pour animaux'}, {v:'other',en:'Other sector',fr:'Autre secteur'}
+  ];
+  const sectorQueries={restaurant:'restaurant',coffee_shop:'cafe',hotel:'hotel',bar:'bar',hair_salon:'hair salon',beauty_salon:'beauty salon',spa:'spa',gym:'gym',car_garage:'car repair',car_dealer:'car dealer',car_rental:'car rental',real_estate:'real estate agency',accounting:'accounting firm',insurance:'insurance agency',law_firm:'law firm',medical_clinic:'medical clinic',dentist:'dentist',physio:'physiotherapist',pharmacy:'pharmacy',retail:'store',clothing_store:'clothing store',furniture_store:'furniture store',kitchen_designer:'kitchen showroom',architect:'architect',construction:'construction company',electrician:'electrician',plumber:'plumber',cleaning:'cleaning service',marketing_agency:'marketing agency',it_services:'it services',school:'school',childcare:'childcare',pet_services:'pet services',other:'business'};
+
+  function fillSectors(){
+    const sel=document.getElementById('sectorSelect'); if(!sel)return;
+    const current=sel.value;
+    sel.innerHTML=`<option value="">${lang==='fr'?'Sélectionnez votre secteur':'Select your sector'}</option>`+sectors.map(s=>`<option value="${s.v}">${s[lang]}</option>`).join('');
+    if(current) sel.value=current;
+  }
+  function setLang(l){
+    lang=l; document.documentElement.lang=l;
+    const lf=document.getElementById('languageField'); if(lf)lf.value=l;
+    document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+    document.querySelector(`.tb[onclick="setLang('${l}')"]`).classList.add('active');
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      const t=el.getAttribute(`data-${l}`); if(!t)return;
+      if(el.tagName==='INPUT'){el.placeholder=t;return;}
+      if(t.includes('<')){el.innerHTML=t;return;}
+      el.textContent=t;
+    });
+    fillSectors(); document.getElementById('mi').textContent=mi[mode][l]; updatePlanLimit(); renderC();
+  }
+  function toggleTheme(){theme=theme==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',theme);document.getElementById('ti').textContent=theme==='light'?'🌙':'☀️';}
+  function setMode(m,btn){mode=m;document.querySelectorAll('.mb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('ms').style.display=(m==='manual'||m==='mixed')?'flex':'none';document.getElementById('mi').textContent=mi[m][lang];}
+  function getLimit(){return PLAN_LIMITS[document.getElementById('planSelect')?.value]||10;}
+  function updatePlanLimit(){
+    const plan=document.getElementById('planSelect')?.value; const limit=getLimit();
+    const txt=lang==='fr'?`Limite selon forfait: ${plan?limit:'3 / 5 / 10'} concurrents maximum`:`Plan limit: ${plan?limit:'3 / 5 / 10'} competitors maximum`;
+    const el=document.getElementById('compLimit'); if(el)el.textContent=txt;
+    if(comps.length>limit){comps=comps.slice(0,limit);renderC();}
+  }
+  function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+  function showStatus(msg,type=''){const el=document.getElementById('compStatus');if(!el)return;el.textContent=msg;el.className='status '+type;}
+  function addCompetitorObject(obj){
+    const limit=getLimit();
+    if(comps.length>=limit){showStatus(lang==='fr'?`Limite atteinte: ${limit} concurrents maximum pour ce forfait.`:`Limit reached: maximum ${limit} competitors for this plan.`,'warn');return false;}
+    const key=(obj.place_id||obj.name||'').toLowerCase(); if(comps.some(c=>(c.place_id||c.name||'').toLowerCase()===key))return false;
+    comps.push(obj); renderC(); return true;
+  }
+  function addC(){const input=document.getElementById('ci');const v=input.value.trim();if(v){addCompetitorObject({name:v,address:'',place_id:'',source:'manual'});input.value='';}}
+  function removeC(i){comps.splice(i,1);renderC();renderSuggestedChecks();}
+  function renderC(){
+    const label=c=>c.address?`${c.name} — ${c.address}`:c.name;
+    const ct=document.getElementById('ct'); if(ct)ct.innerHTML=comps.length?comps.map((c,i)=>`<div class="tag">${escapeHtml(label(c))}<span class="x" onclick="removeC(${i})">✕</span></div>`).join(''):`<span class="help">${lang==='fr'?'Aucun concurrent sélectionné pour le moment.':'No competitor selected yet.'}</span>`;
+    document.getElementById('ch').value=comps.map(label).join('\n');
+    document.getElementById('competitorsJson').value=JSON.stringify(comps);
+  }
+  document.addEventListener('keypress',e=>{if(e.target&&e.target.id==='ci'&&e.key==='Enter'){e.preventDefault();addC();}});
+  function searchCompetitors(){
+    const sector=document.getElementById('sectorSelect').value;
+    if(!placesService||!selectedCompany?.geometry){showStatus(lang==='fr'?'Sélectionnez d’abord votre entreprise exacte avec Google Places.':'First select your exact company with Google Places.','warn');return;}
+    if(!sector){showStatus(lang==='fr'?'Sélectionnez d’abord un secteur d’activité.':'Select a business sector first.','warn');return;}
+    showStatus(lang==='fr'?'Recherche Google Places en cours...':'Searching Google Places...');
+    const query=sectorQueries[sector]||sector;
+    placesService.nearbySearch({location:selectedCompany.geometry.location,radius:12000,keyword:query},(results,status)=>{
+      if(status!==google.maps.places.PlacesServiceStatus.OK||!results){showStatus(lang==='fr'?'Aucun concurrent trouvé. Essayez une zone ou un secteur différent.':'No competitors found. Try another zone or sector.','warn');return;}
+      const ownId=selectedCompany.place_id;
+      suggestedCompetitors=results.filter(r=>r.place_id!==ownId).slice(0,12).map(r=>({name:r.name,address:r.vicinity||'',place_id:r.place_id,rating:r.rating||'',user_ratings_total:r.user_ratings_total||'',source:'google_places'}));
+      renderSuggestedChecks(); showStatus(lang==='fr'?`${suggestedCompetitors.length} concurrents trouvés. Cochez ceux à surveiller.`:`${suggestedCompetitors.length} competitors found. Select the ones to monitor.`,'ok');
+    });
+  }
+  function renderSuggestedChecks(){
+    const box=document.getElementById('compResults'); if(!box)return;
+    box.innerHTML=suggestedCompetitors.map((c,i)=>{const checked=comps.some(x=>x.place_id&&x.place_id===c.place_id);const meta=[c.address,c.rating?`★ ${c.rating}`:'',c.user_ratings_total?`${c.user_ratings_total} reviews`:'' ].filter(Boolean).join(' · ');return `<label class="comp-card"><input type="checkbox" ${checked?'checked':''} onchange="toggleSuggested(${i},this.checked)"><div><div class="comp-name">${escapeHtml(c.name)}</div><div class="comp-meta">${escapeHtml(meta)}</div></div></label>`;}).join('');
+  }
+  function toggleSuggested(i,checked){const c=suggestedCompetitors[i];if(!c)return;if(checked){const ok=addCompetitorObject(c);if(!ok)renderSuggestedChecks();}else{comps=comps.filter(x=>x.place_id!==c.place_id);renderC();}}
+  function buildSignupPayload(){
+    const company=document.getElementById('companyInput').value.trim();
+    const email=document.getElementById('emailInput').value.trim();
+    const telegram=document.getElementById('telegramInput').value.trim();
+    const plan=document.getElementById('planSelect').value;
+    const sectorValue=document.getElementById('sectorSelect').value;
+    const sectorLabel=sectors.find(s=>s.v===sectorValue)?.[lang]||sectorValue;
+    const location=document.getElementById('locationInput').value.trim();
+    const delivery=(document.querySelector('input[name="delivery"]:checked')||{}).value||'email';
+    const compLines=comps.length?comps.map((c,i)=>`${i+1}. ${c.address?`${c.name} — ${c.address}`:c.name}`).join('\n'):(lang==='fr'?'Mode automatique: l’IA sélectionnera les concurrents les plus pertinents.':'Automatic mode: AI will select the most relevant competitors.');
+    const openaiPrompt=`Tu es Maguta Watch AI. Génère un rapport de veille concurrentielle premium, clair et actionnable, en ${lang==='fr'?'français':'anglais'}, pour l'entreprise ${company}.\n\nContexte client:\n- Entreprise: ${company}\n- Adresse Google: ${document.getElementById('companyAddress').value||'-'}\n- Place ID: ${document.getElementById('companyPlaceId').value||'-'}\n- Secteur: ${sectorLabel}\n- Zone: ${location}\n- Forfait: ${plan}\n- Mode: ${mode}\n- Concurrents à surveiller:\n${compLines}\n\nStructure obligatoire:\n1. Résumé exécutif ultra clair\n2. Concurrents surveillés et positionnement\n3. Signaux prix, promotions et offres visibles\n4. Activité web, social media et avis clients\n5. Opportunités commerciales immédiates\n6. Recommandations IA concrètes\n7. Prochaines actions prioritaires.\n\nTon: premium, stratégique, concret, professionnel. Évite le blabla générique. Donne des actions utilisables par un dirigeant.`;
+    return {language:lang,company,email,telegram,plan,mode,sector:sectorLabel,sector_value:sectorValue,location,company_address:document.getElementById('companyAddress').value||'',company_place_id:document.getElementById('companyPlaceId').value||'',company_lat:document.getElementById('companyLat').value||'',company_lng:document.getElementById('companyLng').value||'',delivery,competitors:comps,competitor_lines:compLines,openai_prompt:openaiPrompt};
+  }
+  function prepareSubmit(){
+    const p=buildSignupPayload();
+    if(!p.company||!p.email||!p.plan||!p.sector_value||!p.location)return false;
+    renderC();
+    const adminBrief=`NOUVELLE INSCRIPTION MAGUTA WATCH AI\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nSTATUT\n• Nouvelle inscription reçue\n• Action prioritaire: générer le premier rapport premium\n\nCLIENT\n• Entreprise: ${p.company}\n• Email: ${p.email}\n• Telegram: ${p.telegram||'-'}\n• Langue: ${p.language.toUpperCase()}\n\nABONNEMENT\n• Forfait: ${p.plan.toUpperCase()}\n• Mode: ${p.mode}\n• Livraison: ${p.delivery}\n\nENTREPRISE GOOGLE\n• Secteur: ${p.sector}\n• Zone: ${p.location}\n• Adresse Google: ${p.company_address||'-'}\n• Place ID: ${p.company_place_id||'-'}\n• Coordonnées: ${p.company_lat&&p.company_lng?`${p.company_lat}, ${p.company_lng}`:'-'}\n\nCONCURRENTS À SURVEILLER\n${p.competitor_lines}\n\nPROMPT OPENAI\n${p.openai_prompt}`;
+    const clientPreview=p.language==='fr'?`Bonjour,\n\nMerci pour votre inscription à Maguta Watch AI.\n\nNous avons bien reçu votre demande pour ${p.company}. Notre système prépare votre veille concurrentielle premium sur le secteur ${p.sector}, dans la zone ${p.location}.\n\nVotre premier rapport stratégique est en cours de préparation.\n\nL'équipe Maguta Watch AI`:`Hello,\n\nThank you for signing up to Maguta Watch AI.\n\nWe have received your request for ${p.company}. Our system is preparing your premium competitor intelligence for the ${p.sector} sector in ${p.location}.\n\nYour first strategic report is now being prepared.\n\nThe Maguta Watch AI team`;
+    document.getElementById('emailSummary').value=adminBrief;
+    document.getElementById('openaiPrompt').value=p.openai_prompt;
+    const a=document.getElementById('adminPremiumBrief'); if(a)a.value=adminBrief;
+    const c=document.getElementById('clientConfirmationPreview'); if(c)c.value=clientPreview;
+    return true;
+  }
+  function plainTextReportFromResponse(data){
+    if(data && data.output_text) return data.output_text;
+    try{
+      const parts=[];
+      (data.output||[]).forEach(item=>{
+        (item.content||[]).forEach(c=>{ if(c.text) parts.push(c.text); });
+      });
+      return parts.join('\n\n').trim();
+    }catch(e){return '';}
+  }
+
+  async function generatePremiumReport(payload){
+    const key=(window.MAGUTA_CONFIG&&window.MAGUTA_CONFIG.OPENAI_API_KEY)||'';
+    if(!key || key.includes('PASTE_')) throw new Error('OPENAI_API_KEY missing in config.js');
+    const prompt=`Tu es Maguta Watch AI. Génère un rapport de veille concurrentielle premium en ${payload.language==='fr'?'français':'anglais'} pour ${payload.company}.
+
+IMPORTANT:
+- Utilise la recherche web pour identifier les informations publiques récentes disponibles.
+- Donne des concurrents NOMMÉS, leur positionnement, les prix/offres visibles publiquement quand disponibles.
+- N’invente pas de prix exacts. Si un prix ou une offre n’est pas visible publiquement, indique clairement “non visible publiquement”.
+- Fais un rapport exploitable par un dirigeant, pas un texte générique.
+
+Entreprise cliente:
+- Nom: ${payload.company}
+- Secteur: ${payload.sector}
+- Zone: ${payload.location}
+- Adresse Google: ${payload.company_address||'-'}
+- Place ID: ${payload.company_place_id||'-'}
+- Forfait: ${payload.plan}
+
+Concurrents déjà sélectionnés:
+${payload.competitor_lines}
+
+Structure obligatoire:
+1. Résumé exécutif
+2. Concurrents surveillés — nom, adresse, note Google si fournie, positionnement
+3. Prix, menus, promotions ou offres visibles publiquement
+4. Activité web / social media / avis clients
+5. Opportunités commerciales immédiates
+6. Recommandations IA concrètes
+7. Prochaines actions prioritaires
+
+Format: clair, professionnel, avec titres et listes. Ajoute une courte note si certaines données prix ne sont pas publiquement accessibles.`;
+    const response=await fetch('https://api.openai.com/v1/responses',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
+      body:JSON.stringify({model:(window.MAGUTA_CONFIG&&window.MAGUTA_CONFIG.OPENAI_MODEL)||'gpt-4.1-mini',tools:[{type:'web_search'}],input:prompt})
+    });
+    const data=await response.json();
+    if(!response.ok){throw new Error((data.error&&data.error.message)||'OpenAI error');}
+    const report=plainTextReportFromResponse(data);
+    if(!report) throw new Error('OpenAI returned empty report');
+    return report;
+  }
+
+  async function sendMagutaEmail(to,subject,message){
+    const cfg=window.MAGUTA_CONFIG||{};
+    if(!cfg.EMAILJS_PUBLIC_KEY || !cfg.EMAILJS_SERVICE_ID || !cfg.EMAILJS_TEMPLATE_ID) throw new Error('EmailJS config missing');
+    if(!window.__emailjsReady){emailjs.init(cfg.EMAILJS_PUBLIC_KEY);window.__emailjsReady=true;}
+    return emailjs.send(cfg.EMAILJS_SERVICE_ID,cfg.EMAILJS_TEMPLATE_ID,{to_email:to,subject,message});
+  }
+
+  async function handleSubmit(event){
+    event.preventDefault();
+    if(!prepareSubmit())return false;
+    const btn=event.target.querySelector('button[type="submit"]');
+    const old=btn?btn.textContent:'';
+    if(btn){btn.disabled=true;btn.textContent=lang==='fr'?'Préparation du rapport...':'Preparing report...';}
+    const payload=buildSignupPayload();
+    const clientConfirmation=payload.language==='fr'?`Bonjour,
+
+Merci pour votre inscription à Maguta Watch AI.
+
+Nous avons bien reçu votre demande pour ${payload.company}. Notre système prépare votre veille concurrentielle premium sur le secteur ${payload.sector}, dans la zone ${payload.location}.
+
+Votre premier rapport stratégique est en cours de préparation.
+
+L'équipe Maguta Watch AI`:`Hello,
+
+Thank you for subscribing to Maguta Watch AI.
+
+We have received your request for ${payload.company}. Our system is preparing your premium competitor intelligence for the ${payload.sector} sector in ${payload.location}.
+
+Your first strategic report is now being prepared.
+
+The Maguta Watch AI team`;
+    const adminSubject='New Maguta signup — '+payload.company;
+    const adminMsg=document.getElementById('emailSummary').value||payload.openai_prompt;
+    try{
+      await sendMagutaEmail(payload.email,payload.language==='fr'?'Votre demande Maguta Watch AI a bien été reçue':'Your Maguta Watch AI request has been received',clientConfirmation);
+      await sendMagutaEmail((window.MAGUTA_CONFIG&&window.MAGUTA_CONFIG.ADMIN_EMAIL)||'contactmaguta@gmail.com',adminSubject,adminMsg);
+      const report=await generatePremiumReport(payload);
+      await sendMagutaEmail(payload.email,payload.language==='fr'?'Votre rapport de veille concurrentielle Maguta Watch AI':'Your Maguta Watch AI competitor intelligence report',report);
+      window.location.href='/success.html';
+    }catch(e){
+      console.error(e);
+      alert((lang==='fr'?'Erreur pendant la génération ou l’envoi: ':'Error while generating or sending: ')+e.message);
+      if(btn){btn.disabled=false;btn.textContent=old;}
+    }
+    return false;
+  }
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:.1});document.querySelectorAll('.rev').forEach(el=>obs.observe(el));fillSectors();renderC();updatePlanLimit();
+</script>
+
+<script>
+function initGooglePlaces(){
+  try {
+    const mapDiv=document.createElement('div'); placesService=new google.maps.places.PlacesService(mapDiv);
+    const companyInput=document.getElementById('companyInput');
+    if(companyInput){const companyAutocomplete=new google.maps.places.Autocomplete(companyInput,{types:['establishment'],fields:['place_id','name','formatted_address','geometry','address_components']});companyAutocomplete.addListener('place_changed',()=>{const place=companyAutocomplete.getPlace();if(place&&place.name){selectedCompany=place;document.getElementById('companyInput').value=place.name;document.getElementById('companyPlaceId').value=place.place_id||'';document.getElementById('companyAddress').value=place.formatted_address||'';if(place.geometry&&place.geometry.location){document.getElementById('companyLat').value=place.geometry.location.lat();document.getElementById('companyLng').value=place.geometry.location.lng();}const card=document.getElementById('companyCard');card.style.display='block';card.innerHTML=`<strong>${place.name}</strong><br>${place.formatted_address||''}`;if(place.formatted_address){document.getElementById('locationInput').value=place.formatted_address;}suggestedCompetitors=[];document.getElementById('compResults').innerHTML='';}});}
+    const locationInput=document.getElementById('locationInput'); if(locationInput){new google.maps.places.Autocomplete(locationInput,{types:['(regions)'],fields:['formatted_address','name','geometry']});}
+    const competitorInput=document.getElementById('ci'); if(competitorInput){const competitorAutocomplete=new google.maps.places.Autocomplete(competitorInput,{types:['establishment'],fields:['place_id','name','formatted_address','geometry']});competitorAutocomplete.addListener('place_changed',()=>{const place=competitorAutocomplete.getPlace();if(place&&place.name){addCompetitorObject({name:place.name,address:place.formatted_address||'',place_id:place.place_id||'',source:'google_places_manual'});competitorInput.value='';}});}
+  } catch(e) { console.warn('Google Places not loaded correctly', e); }
+}
+window.gm_authFailure=function(){console.warn('Google Places API authorization failed. Check API restrictions for maguta.io.');};
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIHULHnSArcJNa7nViLxpUzGjFIwP5tzA&libraries=places&callback=initGooglePlaces"></script>
+
+</body>
+</html>
