@@ -33,7 +33,7 @@
 
     <section class="formbox" id="onboarding">
       <h2 data-i18n="formTitle">Configurer votre rapport</h2>
-      <p class="small" data-i18n="formHelp">Pour tester sans paiement, remplissez ce formulaire. En production, Stripe renverra le client ici après paiement.</p>
+      <p class="small" data-i18n="formHelp">Remplissez ce formulaire puis vous serez redirigé vers le paiement. Vos emails arriveront automatiquement après confirmation.</p>
       <form id="magutaForm">
         <input type="hidden" name="plan" id="plan" value="starter" />
         <input type="hidden" name="billing" id="billing" value="monthly" />
@@ -48,7 +48,7 @@
         </div>
         <label>Concurrents connus</label><textarea name="competitors" placeholder="Côté Cuisines Sàrl — Prilly&#10;TEK Cuisines SA — Crissier&#10;APF Etoy — Etoy"></textarea>
         <label>Notes internes</label><textarea name="notes" placeholder="Objectif, cible, éléments à surveiller..."></textarea>
-        <button class="btn gold" type="submit" data-i18n="submit">Générer et envoyer</button>
+        <button class="btn gold" type="submit" data-i18n="submit">Continuer vers le paiement →</button>
       </form>
       <div id="status" class="status"></div>
     </section>
@@ -71,7 +71,7 @@ const STRIPE = {
 };
 const PRICES={monthly:{starter:['€9','/mois'],pro:['€19','/mois'],enterprise:['€29','/mois']},yearly:{starter:['€90','/an'],pro:['€190','/an'],enterprise:['€290','/an']}};
 let lang='fr', billing='monthly';
-const t={fr:{eyebrow:'Veille concurrentielle automatisée',title:'Surveillez vos concurrents automatiquement',subtitle:'Sélectionnez une offre, configurez votre entreprise, puis recevez une confirmation immédiate et un premier rapport généré automatiquement.',monthly:'Mensuel',yearly:'Annuel - économisez 2 mois',starterText:'Pour une première veille locale.',proText:'Pour suivre plus de concurrents et recevoir une analyse plus avancée.',enterpriseText:'Pour les zones plus larges et les recommandations stratégiques.',formTitle:'Configurer votre rapport',formHelp:'Pour tester sans paiement, remplissez ce formulaire. En production, Stripe renverra le client ici après paiement.',submit:'Générer et envoyer'},en:{eyebrow:'Automated competitor intelligence',title:'Automatically monitor your competitors',subtitle:'Choose a plan, configure your business, then receive an immediate confirmation and a first automated report.',monthly:'Monthly',yearly:'Yearly - save 2 months',starterText:'For a first local intelligence report.',proText:'For tracking more competitors with deeper analysis.',enterpriseText:'For wider areas and strategic recommendations.',formTitle:'Configure your report',formHelp:'For testing without payment, complete this form. In production, Stripe redirects clients here after payment.',submit:'Generate and send'}};
+const t={fr:{eyebrow:'Veille concurrentielle automatisée',title:'Surveillez vos concurrents automatiquement',subtitle:'Sélectionnez une offre, configurez votre entreprise, puis recevez une confirmation immédiate et un premier rapport généré automatiquement.',monthly:'Mensuel',yearly:'Annuel - économisez 2 mois',starterText:'Pour une première veille locale.',proText:'Pour suivre plus de concurrents et recevoir une analyse plus avancée.',enterpriseText:'Pour les zones plus larges et les recommandations stratégiques.',formTitle:'Configurer votre rapport',formHelp:'Remplissez ce formulaire puis vous serez redirigé vers le paiement. Vos emails arriveront automatiquement après confirmation.',submit:'Continuer vers le paiement →'},en:{eyebrow:'Automated competitor intelligence',title:'Automatically monitor your competitors',subtitle:'Choose a plan, configure your business, then receive an immediate confirmation and a first automated report.',monthly:'Monthly',yearly:'Yearly - save 2 months',starterText:'For a first local intelligence report.',proText:'For tracking more competitors with deeper analysis.',enterpriseText:'For wider areas and strategic recommendations.',formTitle:'Configure your report',formHelp:'Fill in this form and you will be redirected to payment. Your emails will arrive automatically after confirmation.',submit:'Continue to payment →'}};
 function setLang(l){lang=l;document.getElementById('language').value=l;document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=t[l][e.dataset.i18n]);document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));}
 function setBilling(b){billing=b;document.getElementById('billing').value=b;document.querySelectorAll('[data-billing]').forEach(x=>x.classList.toggle('active',x.dataset.billing===b));['starter','pro','enterprise'].forEach(p=>{document.querySelector(`[data-price="${p}"]`).textContent=PRICES[b][p][0];document.querySelector(`[data-period="${p}"]`).textContent=PRICES[b][p][1];});}
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
@@ -80,14 +80,17 @@ document.querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>{document.getE
 const params=new URLSearchParams(location.search); if(params.get('plan')) document.getElementById('plan').value=params.get('plan'); if(params.get('period')){setBilling(params.get('period'));}
 const status=document.getElementById('status');
 function show(msg,type=''){status.style.display='block';status.className='status '+type;status.textContent=msg;}
+
+const API='https://3cbc0227-1e60-4dd6-ae20-b4b51648850c-00-3n2ph23sgpp77.riker.replit.dev';
 document.getElementById('magutaForm').addEventListener('submit',async(e)=>{
- e.preventDefault(); show(lang==='fr'?'Génération en cours...':'Generating report...');
+ e.preventDefault();show(lang==='fr'?'Redirection vers le paiement...':'Redirecting to payment...');
  const data=Object.fromEntries(new FormData(e.target).entries());
  try{
-  const r=await fetch('/api/generate-and-send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const r=await fetch(API+'/api/presave',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   const j=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(j.error||'Erreur inconnue');
-  show(lang==='fr'?'Confirmation et rapport envoyés.':'Confirmation and report sent.','ok');
+  if(!r.ok)throw new Error(j.error||'Erreur inconnue');
+  if(j.url){window.location.href=j.url;}
+  else{show(lang==='fr'?'Lien introuvable.':'Link not found.','err');}
  }catch(err){show((lang==='fr'?'Erreur: ':'Error: ')+err.message,'err');}
 });
 </script>
