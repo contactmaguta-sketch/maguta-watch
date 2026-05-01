@@ -1,0 +1,11 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/generate-and-send"
+  to = "/.netlify/functions/generate-and-send"
+  status = 200
