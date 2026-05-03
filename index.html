@@ -285,7 +285,7 @@
         <li data-en="1 weekly report by email" data-fr="1 rapport hebdomadaire par email">1 weekly report by email</li>
         <li data-en="Prices, visible offers and website signals" data-fr="Prix, offres visibles et signaux web">Prices, visible offers and website signals</li>
       </ul>
-      <div class="pay-options"><a href="#signup" class="btn-s" onclick="choosePlan('starter')" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
+      <div class="pay-options"><a href="#signup" class="btn-s" onclick="choosePlan('starter',currentBillingPeriod)" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
     </div>
     <div class="pc feat">
       <div class="pbadge" data-en="MOST POPULAR" data-fr="LE PLUS POPULAIRE">MOST POPULAR</div>
@@ -299,7 +299,7 @@
         <li data-en="1–2 weekly reports by email" data-fr="1–2 rapports hebdomadaires par email">1–2 weekly reports by email</li>
         <li data-en="Prices, social signals, reviews and positioning" data-fr="Prix, signaux sociaux, avis et positionnement">Prices, social signals, reviews and positioning</li>
       </ul>
-      <div class="pay-options"><a href="https://buy.stripe.com/bJe8wH63xgs73JL6wO0Fi02" class="btn-p" data-checkout="pro" data-en="Get started" data-fr="Commencer">Get started</a></div>
+      <div class="pay-options"><a href="#signup" class="btn-p" onclick="choosePlan('pro',currentBillingPeriod)" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
     </div>
     <div class="pc">
       <div class="plv">Enterprise</div>
@@ -312,7 +312,7 @@
         <li data-en="Weekly strategic report by email" data-fr="Rapport stratégique hebdomadaire par email">Weekly strategic report by email</li>
         <li data-en="Strategic AI recommendations" data-fr="Recommandations stratégiques IA">Strategic AI recommendations</li>
       </ul>
-      <div class="pay-options"><a href="#signup" class="btn-s" onclick="choosePlan('enterprise')" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
+      <div class="pay-options"><a href="#signup" class="btn-s" onclick="choosePlan('enterprise',currentBillingPeriod)" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
     </div>
   </div>
 </section>
@@ -365,6 +365,15 @@
             <button type="button" class="btn-promo" id="btnPromo" onclick="applyPromoCode()" data-en="Apply" data-fr="Appliquer">Apply</button>
           </div>
           <div class="promo-hint" id="promoHint" data-en="Promo code applied — discount confirmed at next step." data-fr="Code promo appliqué — réduction confirmée à l'étape suivante.">Promo code applied — discount confirmed at next step.</div>
+        </div>
+        <div class="fg full" id="formBillingBlock">
+          <label data-en="BILLING PERIOD" data-fr="PÉRIODE DE FACTURATION">BILLING PERIOD</label>
+          <div class="mt">
+            <button type="button" class="mb active" id="btnBillingMonthly" onclick="setFormBilling('monthly',this)" data-en="📅 Monthly" data-fr="📅 Mensuel">📅 Monthly</button>
+            <button type="button" class="mb" id="btnBillingYearly" onclick="setFormBilling('yearly',this)" data-en="⭐ Yearly — Save 2 months" data-fr="⭐ Annuel — 2 mois offerts">⭐ Yearly — Save 2 months</button>
+          </div>
+          <div id="billingInfo" style="font-family:DM Mono,monospace;font-size:.72rem;color:var(--muted);padding:11px;border:1px solid var(--border);border-radius:2px;" data-en="You will be billed monthly. Cancel anytime." data-fr="Vous serez facturé mensuellement. Résiliation à tout moment.">You will be billed monthly. Cancel anytime.</div>
+          <input type="hidden" name="billing" id="billingField" value="monthly">
         </div>
         <div class="fg full">
           <label data-en="MONITORING MODE" data-fr="MODE DE SURVEILLANCE">MONITORING MODE</label>
@@ -441,7 +450,9 @@ const PLACES_API='https://maguta-watch.replit.app';
       enterprise: ['290€','/year','/an','Save 58€ / Économie 58€']
     }
   };
+  let currentBillingPeriod='monthly';
   function setBilling(period, btn){
+    currentBillingPeriod=period;
     document.querySelectorAll('.billing-toggle button').forEach(b=>b.classList.remove('active'));
     if(btn) btn.classList.add('active');
     ['starter','pro','enterprise'].forEach(plan=>{
@@ -543,7 +554,8 @@ const PLACES_API='https://maguta-watch.replit.app';
     const compLines=comps.length?comps.map((c,i)=>`${i+1}. ${c.address?`${c.name} — ${c.address}`:c.name}`).join('\n'):(lang==='fr'?"Mode automatique: l’IA sélectionnera les concurrents les plus pertinents.":'Automatic mode: AI will select the most relevant competitors.');
     const openaiPrompt=`Tu es Maguta Watch AI. Génère un rapport de veille concurrentielle premium, clair et actionnable, en ${lang==='fr'?'français':'anglais'}, pour l'entreprise ${company}.\n\nContexte client:\n- Entreprise: ${company}\n- Adresse Google: ${document.getElementById('companyAddress').value||'-'}\n- Place ID: ${document.getElementById('companyPlaceId').value||'-'}\n- Secteur: ${sectorLabel}\n- Zone: ${location}\n- Forfait: ${plan}\n- Mode: ${mode}\n- Concurrents à surveiller:\n${compLines}\n\nStructure obligatoire:\n1. Résumé exécutif ultra clair\n2. Concurrents surveillés et positionnement\n3. Signaux prix, promotions et offres visibles\n4. Activité web, social media et avis clients\n5. Opportunités commerciales immédiates\n6. Recommandations IA concrètes\n7. Prochaines actions prioritaires.\n\nTon: premium, stratégique, concret, professionnel. Évite le blabla générique. Donne des actions utilisables par un dirigeant.`;
     const promoCode=(document.getElementById('promoInput')?.value||'').trim().toUpperCase();
-    return {language:lang,company,email,telegram,plan,mode,sector:sectorLabel,sector_value:sectorValue,location,promoCode,company_address:document.getElementById('companyAddress').value||'',company_place_id:document.getElementById('companyPlaceId').value||'',company_lat:document.getElementById('companyLat').value||'',company_lng:document.getElementById('companyLng').value||'',delivery,competitors:comps,competitor_lines:compLines,openai_prompt:openaiPrompt};
+    const billing=document.getElementById('billingField')?.value||'monthly';
+    return {language:lang,company,email,telegram,plan,billing,mode,sector:sectorLabel,sector_value:sectorValue,location,promoCode,company_address:document.getElementById('companyAddress').value||'',company_place_id:document.getElementById('companyPlaceId').value||'',company_lat:document.getElementById('companyLat').value||'',company_lng:document.getElementById('companyLng').value||'',delivery,competitors:comps,competitor_lines:compLines,openai_prompt:openaiPrompt};
   }
   function prepareSubmit(){
     const p=buildSignupPayload();
@@ -717,9 +729,29 @@ window.gm_authFailure=function(){console.warn('Google Places API authorization f
     }
   })();
   
-  function choosePlan(plan){
+  let formBilling='monthly';
+  function setFormBilling(period,btn){
+    formBilling=period;
+    document.querySelectorAll('#formBillingBlock .mb').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    const field=document.getElementById('billingField');
+    if(field) field.value=period;
+    const info=document.getElementById('billingInfo');
+    if(info){
+      if(period==='yearly'){
+        info.textContent=lang==='fr'?'Paiement annuel — vous économisez 2 mois par rapport au mensuel.':'Yearly billing — you save 2 months compared to monthly.';
+      } else {
+        info.textContent=lang==='fr'?'Vous serez facturé mensuellement. Résiliation à tout moment.':'You will be billed monthly. Cancel anytime.';
+      }
+    }
+  }
+  function choosePlan(plan, billing){
     const sel=document.getElementById('planSelect');
     if(sel){sel.value=plan;updatePlanLimit();}
+    if(billing){
+      const btn=document.getElementById(billing==='yearly'?'btnBillingYearly':'btnBillingMonthly');
+      setFormBilling(billing, btn);
+    }
   }
   function openModal(type){
     const id=type==='terms'?'modalTerms':'modalPrivacy';
