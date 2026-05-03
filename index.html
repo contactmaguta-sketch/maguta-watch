@@ -154,6 +154,18 @@
   .btn-promo:hover{background:rgba(200,160,80,.2);border-color:var(--gold)}
   .btn-promo.ok{background:rgba(74,154,106,.1);border-color:var(--green);color:var(--green)}
   .promo-hint{font-family:DM Mono,monospace;font-size:.66rem;color:var(--green);margin-top:5px;display:none}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(8,10,8,.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal-box{background:var(--bg2);border:1px solid var(--border);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:48px 40px;position:relative;border-radius:2px}
+  .modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;transition:color .2s}
+  .modal-close:hover{color:var(--gold)}
+  .modal-box h3{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:24px;letter-spacing:.05em}
+  .modal-box h4{font-family:'Cinzel',serif;font-size:.9rem;color:var(--gold);margin:20px 0 8px;letter-spacing:.05em}
+  .modal-box p,.modal-box li{font-size:.9rem;color:var(--muted);line-height:1.75;margin-bottom:8px}
+  .modal-box ul{padding-left:18px}
+  @media(max-width:640px){.modal-box{padding:32px 22px}}
   @keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
   .rev{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
   .rev.vis{opacity:1;transform:translateY(0)}
@@ -172,7 +184,9 @@
   .billing-toggle{display:flex;justify-content:center;gap:8px;margin:26px 0 32px;flex-wrap:wrap}
   .billing-toggle button{background:transparent;color:var(--muted);border:1px solid var(--border);padding:12px 22px;font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;letter-spacing:.08em;border-radius:2px;cursor:pointer;transition:all .3s}
   .billing-toggle button.active{background:var(--gold);color:#080A08;border-color:var(--gold)}
-  .saving{color:var(--gold);font-size:.82rem;text-align:center;margin-top:-16px;margin-bottom:28px;letter-spacing:.04em}
+  .saving{display:flex;justify-content:center;align-items:center;gap:8px;background:rgba(200,160,80,.12);border:1px solid rgba(200,160,80,.4);border-radius:4px;padding:12px 24px;text-align:center;margin:0 auto 28px;max-width:400px;letter-spacing:.04em}
+  .saving-badge{background:var(--gold);color:#080A08;font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;padding:3px 10px;border-radius:2px;white-space:nowrap}
+  .saving-text{color:var(--text);font-family:DM Mono,monospace;font-size:.78rem}
   .pay-options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:20px}
   .pay-options a{display:block;text-align:center;padding:13px 14px;font-size:.78rem}
   .annual-note{color:var(--gold);font-size:.82rem;margin-top:8px;min-height:18px}
@@ -254,7 +268,10 @@
     <button type="button" class="active" onclick="setBilling('monthly', this)" data-en="Monthly" data-fr="Mensuel">Monthly</button>
     <button type="button" onclick="setBilling('yearly', this)" data-en="Yearly" data-fr="Annuel">Yearly</button>
   </div>
-  <div class="saving" data-en="Yearly billing saves 2 months." data-fr="Le paiement annuel vous fait économiser 2 mois.">Yearly billing saves 2 months.</div>
+  <div class="saving">
+    <span class="saving-badge" data-en="SAVE 2 MONTHS" data-fr="2 MOIS OFFERTS">SAVE 2 MONTHS</span>
+    <span class="saving-text" data-en="Switch to yearly and pay only 10 months" data-fr="Passez à l'annuel et ne payez que 10 mois">Switch to yearly and pay only 10 months</span>
+  </div>
 
   <div class="pg">
     <div class="pc">
@@ -268,7 +285,7 @@
         <li data-en="1 weekly report by email" data-fr="1 rapport hebdomadaire par email">1 weekly report by email</li>
         <li data-en="Prices, visible offers and website signals" data-fr="Prix, offres visibles et signaux web">Prices, visible offers and website signals</li>
       </ul>
-      <div class="pay-options"><a href="https://buy.stripe.com/aFadR12RlcbRgwx7AS0Fi00" class="btn-s" data-checkout="starter" data-en="Get started" data-fr="Commencer">Get started</a></div>
+      <div class="pay-options"><a href="#signup" class="btn-s" onclick="choosePlan('starter')" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
     </div>
     <div class="pc feat">
       <div class="pbadge" data-en="MOST POPULAR" data-fr="LE PLUS POPULAIRE">MOST POPULAR</div>
@@ -295,7 +312,7 @@
         <li data-en="Weekly strategic report by email" data-fr="Rapport stratégique hebdomadaire par email">Weekly strategic report by email</li>
         <li data-en="Strategic AI recommendations" data-fr="Recommandations stratégiques IA">Strategic AI recommendations</li>
       </ul>
-      <div class="pay-options"><a href="https://buy.stripe.com/8x29ALbnR3Fla899J00Fi01" class="btn-s" data-checkout="enterprise" data-en="Get started" data-fr="Commencer">Get started</a></div>
+      <div class="pay-options"><a href="#signup" class="btn-s" onclick="choosePlan('enterprise')" data-en="Choose this plan" data-fr="Choisir ce forfait">Choose this plan</a></div>
     </div>
   </div>
 </section>
@@ -388,8 +405,8 @@
 <footer>
   <div><div class="flo">MAGUTA WATCH</div><div class="fta">Intelligence · Market · Precision</div></div>
   <div class="fli">
-    <a href="#" data-en="Terms of service" data-fr="Conditions d'utilisation">Terms of service</a>
-    <a href="#" data-en="Privacy policy" data-fr="Politique de confidentialité">Privacy policy</a>
+    <a href="#" onclick="openModal('terms')" data-en="Terms of service" data-fr="Conditions d'utilisation">Terms of service</a>
+    <a href="#" onclick="openModal('privacy')" data-en="Privacy policy" data-fr="Politique de confidentialité">Privacy policy</a>
     <a href="mailto:contactmaguta@gmail.com">contactmaguta@gmail.com</a>
   </div>
 </footer>
@@ -699,6 +716,111 @@ window.gm_authFailure=function(){console.warn('Google Places API authorization f
       init();
     }
   })();
-  </script>
+  
+  function choosePlan(plan){
+    const sel=document.getElementById('planSelect');
+    if(sel){sel.value=plan;updatePlanLimit();}
+  }
+  function openModal(type){
+    const id=type==='terms'?'modalTerms':'modalPrivacy';
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow='hidden';
+    const enEl=document.getElementById(type+'En');
+    const frEl=document.getElementById(type+'Fr');
+    if(enEl) enEl.style.display=lang==='fr'?'none':'block';
+    if(frEl) frEl.style.display=lang==='fr'?'block':'none';
+  }
+  function closeModal(type){
+    const id=type==='terms'?'modalTerms':'modalPrivacy';
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow='';
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('terms');closeModal('privacy');}});
+
+</script>
+
+<!-- Modal Conditions d'utilisation -->
+<div class="modal-overlay" id="modalTerms" onclick="if(event.target===this)closeModal('terms')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('terms')">✕</button>
+    <h3 data-en="Terms of Service" data-fr="Conditions d'utilisation">Terms of Service</h3>
+    <div id="termsEn">
+      <h4>1. Service Description</h4>
+      <p>Maguta Watch AI is a competitive intelligence service that monitors your competitors and delivers weekly AI-generated reports by email.</p>
+      <h4>2. Subscription & Payment</h4>
+      <p>Subscriptions are billed monthly or annually. All payments are processed securely through Stripe. You may cancel at any time from your account settings.</p>
+      <h4>3. Cancellation</h4>
+      <p>You can cancel your subscription at any time. Your service remains active until the end of the current billing period. No refunds are issued for partial periods.</p>
+      <h4>4. Data Usage</h4>
+      <p>We collect publicly available competitor data only. Your personal information is used solely to provide the service and is never sold to third parties.</p>
+      <h4>5. Limitation of Liability</h4>
+      <p>Maguta Watch AI provides information for strategic decision-making purposes. We are not liable for business decisions made based on our reports.</p>
+      <h4>6. Contact</h4>
+      <p>Questions: contactmaguta@gmail.com</p>
+    </div>
+    <div id="termsFr" style="display:none">
+      <h4>1. Description du service</h4>
+      <p>Maguta Watch AI est un service de veille concurrentielle qui surveille vos concurrents et vous envoie chaque semaine des rapports générés par IA, par email.</p>
+      <h4>2. Abonnement et paiement</h4>
+      <p>Les abonnements sont facturés mensuellement ou annuellement. Tous les paiements sont traités de façon sécurisée via Stripe. Vous pouvez résilier à tout moment.</p>
+      <h4>3. Résiliation</h4>
+      <p>Vous pouvez résilier votre abonnement à tout moment. Le service reste actif jusqu'à la fin de la période de facturation en cours. Aucun remboursement n'est accordé pour les périodes partielles.</p>
+      <h4>4. Utilisation des données</h4>
+      <p>Nous collectons uniquement des données publiques sur vos concurrents. Vos informations personnelles sont utilisées exclusivement pour la fourniture du service et ne sont jamais revendues.</p>
+      <h4>5. Limitation de responsabilité</h4>
+      <p>Maguta Watch AI fournit des informations à des fins d'aide à la décision stratégique. Nous ne sommes pas responsables des décisions prises sur la base de nos rapports.</p>
+      <h4>6. Contact</h4>
+      <p>Questions : contactmaguta@gmail.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Politique de confidentialité -->
+<div class="modal-overlay" id="modalPrivacy" onclick="if(event.target===this)closeModal('privacy')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('privacy')">✕</button>
+    <h3 data-en="Privacy Policy" data-fr="Politique de confidentialité">Privacy Policy</h3>
+    <div id="privacyEn">
+      <h4>Data We Collect</h4>
+      <ul>
+        <li>Company name, email address, Telegram username (optional)</li>
+        <li>Business sector, location and competitor list</li>
+        <li>Subscription plan and payment status (via Stripe)</li>
+      </ul>
+      <h4>How We Use Your Data</h4>
+      <ul>
+        <li>To generate and deliver your weekly competitive intelligence reports</li>
+        <li>To manage your subscription and billing</li>
+        <li>To contact you about your service</li>
+      </ul>
+      <h4>Data Storage</h4>
+      <p>Your data is stored securely on Replit infrastructure and is never sold or shared with third parties.</p>
+      <h4>Your Rights</h4>
+      <p>You may request access to, modification or deletion of your personal data at any time by contacting contactmaguta@gmail.com.</p>
+      <h4>Cookies</h4>
+      <p>This site does not use tracking cookies.</p>
+    </div>
+    <div id="privacyFr" style="display:none">
+      <h4>Données collectées</h4>
+      <ul>
+        <li>Nom d'entreprise, adresse email, nom d'utilisateur Telegram (facultatif)</li>
+        <li>Secteur d'activité, localisation et liste de concurrents</li>
+        <li>Forfait choisi et statut de paiement (via Stripe)</li>
+      </ul>
+      <h4>Utilisation des données</h4>
+      <ul>
+        <li>Génération et envoi de vos rapports de veille hebdomadaires</li>
+        <li>Gestion de votre abonnement et facturation</li>
+        <li>Communication relative à votre service</li>
+      </ul>
+      <h4>Stockage</h4>
+      <p>Vos données sont hébergées de façon sécurisée sur l'infrastructure Replit et ne sont jamais vendues ni partagées avec des tiers.</p>
+      <h4>Vos droits</h4>
+      <p>Vous pouvez à tout moment demander l'accès, la modification ou la suppression de vos données en contactant contactmaguta@gmail.com.</p>
+      <h4>Cookies</h4>
+      <p>Ce site n'utilise pas de cookies de suivi.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
